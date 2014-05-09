@@ -1,0 +1,66 @@
+// Found word in dictionary By Prefix Tree
+// Prefix tree also calls Trie Tree and Radix Tree
+// Prefix tree with memory address
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+char arr[1000];
+struct node
+{
+    node *next[123];
+    bool endmark ;
+    node()
+    {
+        for(int i=0;i<=122;i++) next[i]=false;
+        endmark=false;
+    }
+};
+void Insert(char *word,int len,node *root)
+{
+    for(int i=0;i<len;i++)
+    {
+        int ix = word[i];
+        if(root->next[ix]==NULL) root->next[ix]=new node();
+        root=root->next[ix];
+    }
+    root->endmark=true;
+}
+bool Search(char *word,int len,node *root)
+{
+    for(int i=0;i<len;i++)
+    {
+        int ix = word[i];
+        if(root->next[ix]==NULL) return false;
+        root=root->next[ix];
+    }
+    if(root->endmark) return true; return false;
+}
+void Delete(node *root)
+{
+    for(int i=0;i<=122;i++)
+    {
+        if(root->next[i]!=NULL) Delete(root->next[i]);
+    }
+    delete(root);
+}
+int main()
+{
+    int N ; // How many numbers in dictionary
+    scanf("%d",&N);
+    node *head = new node();
+    while(N--)
+    {
+        scanf("%s",&arr);
+        Insert(arr,strlen(arr),head);
+    }
+    int q;
+    scanf("%d",&q); // Numbers of query
+    while(q--)
+    {
+        scanf("%s",&arr);
+        if(Search(arr,strlen(arr),head)) puts("Found!");
+        else puts("Not Found!");
+    }
+    Delete(head); // Delete the tree for avoiding Memory Limit problem
+    return 0;
+}

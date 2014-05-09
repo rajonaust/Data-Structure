@@ -1,0 +1,34 @@
+#include <stdio.h>
+using namespace std;
+int parent[1000];
+int find_parent(int x)
+{
+    if(parent[x]==x) return x;
+    else return parent[x] = find_parent(parent[x]);
+}
+void Union(int a,int b)
+{
+    int x = find_parent(a) , y = find_parent(b);
+    if(x==y) printf("THEY ARE ALREADY FRIENDS\n");
+    else
+    {
+        parent[x]=y; // parent[y]=x can write too
+    }
+}
+void makeset(int N)
+{
+    for(int i=1;i<=N;i++) parent[i] = i ;
+}
+int main()
+{
+    int N,M; // N is the number of persons M is the number of friends
+    scanf("%d%d",&N,&M);
+    makeset(N);
+    while(M--)
+    {
+        int a , b ;
+        scanf("%d%d",&a,&b);
+        Union(a,b);
+    }
+    return 0;
+}

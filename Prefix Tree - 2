@@ -1,0 +1,52 @@
+// Found word in dictionary By Prefix Tree
+// Prefix tree also calls Trie Tree and Radix Tree
+// Prefix tree with array
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+char arr[1000];
+int cnt = 0 ;
+struct
+{
+    int next[123]={0};
+    bool endmark=false;
+}node[100000+10];
+void Insert(char *word,int len,int pointer)
+{
+    for(int i=0;i<len;i++)
+    {
+        int ix = word[i];
+        if(node[pointer].next[ix]==0) node[pointer].next[ix]=++cnt;
+        pointer=node[pointer].next[ix];
+    }
+    node[pointer].endmark=true;
+}
+bool Search(char *word,int len,int pointer)
+{
+    for(int i=0;i<len;i++)
+    {
+        int ix = word[i];
+        if(node[pointer].next[ix]==0) return false;
+        pointer=node[pointer].next[ix];
+    }
+    if(node[pointer].endmark) return true; return false;
+}
+int main()
+{
+    int N ; // How many numbers in dictionary
+    scanf("%d",&N);
+    while(N--)
+    {
+        scanf("%s",&arr);
+        Insert(arr,strlen(arr),0);
+    }
+    int q;
+    scanf("%d",&q); // Numbers of query
+    while(q--)
+    {
+        scanf("%s",&arr);
+        if(Search(arr,strlen(arr),0)) puts("Found!");
+        else puts("Not Found!");
+    }
+    return 0;
+}

@@ -1,0 +1,35 @@
+// Time complexity O(logN)
+// Used in C++ STL binary_search function
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+int input[1000];
+bool binarysearch(int arr[],int N,int number)
+{
+    int low=0,high=N-1;
+    while(low<=high)
+    {
+        int mid=(low+high)/2;
+        if(number<arr[mid]) high=mid-1;
+        else if(number>arr[mid]) low=mid+1;
+        else if(number==arr[mid]) return true;
+    }
+    return false;
+}
+int main()
+{
+    int N,Q; // N is the number of values insert into array and Q is the number of queries
+    scanf("%d%d",&N,&Q);
+    for(int i=0;i<N;i++)
+    {
+        scanf("%d",&input[i]);
+    }
+    sort(input,input+N); // Sort the numbers in ascending order
+    while(Q--)
+    {
+        int number; // The number which is search in the array
+        scanf("%d",&number);
+        printf("%d\n",binarysearch(input,N,number)); // If output is 1 than number is present in array . If output is 0 than number is absent in array .
+    }
+    return 0;
+}

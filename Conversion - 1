@@ -1,0 +1,56 @@
+/*Given Preorder and Inorder show Postorder*/
+#include <map>
+#include <iostream>
+using namespace std;
+struct node
+{
+    node *left,*right;
+    char x;
+    node()
+    {
+        left=NULL;right=NULL;
+    }
+};
+string preorder,inorder;
+map <char,int> order;
+void construct_tree(int start,int finish,node *root)
+{
+    int priority = 10000 , index = -1;
+    for(int i=start;i<=finish;i++)
+    {
+        if(order[inorder[i]]<priority)
+        {
+            index=i;
+            priority=order[inorder[i]];
+        }
+    }
+    root->x=inorder[index];
+    if(start!=index)
+    {
+        root->left=new node();
+        construct_tree(start,index-1,root->left);
+    }
+    if(finish!=index)
+    {
+        root->right=new node();
+        construct_tree(index+1,finish,root->right);
+    }
+}
+void postorder(node *root)
+{
+    if(root->left!=NULL) postorder(root->left);
+    if(root->right!=NULL) postorder(root->right);
+    cout<<root->x;
+}
+int main()
+{
+    cin>>preorder>>inorder;
+    int len = preorder.size();
+    for(int i=0;i<preorder.size();i++)
+        order[preorder[i]]=i+1;
+    node *head = new node();
+    construct_tree(0,len-1,head);
+    postorder(head);
+    cout<<"\n";
+    return 0;
+}

@@ -1,0 +1,66 @@
+/*Given Preorder. Than construct Binary Tree and show Postorder and Inorder.*/
+#include <stdio.h>
+#include <vector>
+#include <iostream>
+using namespace std;
+struct node
+{
+    node *left,*right;
+    int X;
+    node()
+    {
+        left = NULL;right=NULL;
+    }
+};
+void construct_tree(vector <int> input,node *root)
+{
+    root->X=input[0];
+    vector <int> lh,rh;
+    int l = input.size();
+    for(int i=1;i<l;i++)
+    {
+        if(input[i]>input[0]) rh.push_back(input[i]);else lh.push_back(input[i]);
+    }
+    if(lh.size()!=0)
+    {
+        root->left=new node();
+        construct_tree(lh,root->left);
+    }
+    if(rh.size()!=0)
+    {
+        root->right=new node();
+        construct_tree(rh,root->right);
+    }
+}
+void postorder(node *root)
+{
+    if(root->left!=NULL) postorder(root->left);
+    if(root->right!=NULL) postorder(root->right);
+    cout<<root->X<<"\n";
+}
+void inorder(node *root)
+{
+    if(root->left!=NULL) inorder(root->left);
+    cout<<root->X<<"\n";
+    if(root->right!=NULL) inorder(root->right);
+}
+int main()
+{
+    vector <int> input;
+    int X; //How many numbers
+    cin>>X;
+    //Insert numbers
+    while(X--)
+    {
+        int number;
+        cin>>number;
+        input.push_back(number);
+    }
+    node *head = new node();
+    construct_tree(input,head);
+    cout<<"Postorder : \n";
+    postorder(head);
+    cout<<"Inorder : \n";
+    inorder(head);
+    return 0;
+}

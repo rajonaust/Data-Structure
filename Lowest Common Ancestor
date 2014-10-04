@@ -1,0 +1,96 @@
+// Lowest Common Ancestor
+// Give a directed tree with no cycle . Tree's root is 0 . And the nodes are 0,1,....,N-1 . Every node's parent is only one node .
+// Give two nodes . Find their lowest common parent node .
+#include <cstdio>
+#include <vector>
+#include <cstring>
+using namespace std;
+#define mx 1000
+#define memo(a,b) memset(a,b,sizeof(a))
+#define pb push_back
+vector <int> graph[mx+10];
+int L[mx+10] , T[mx+10] , P[mx+10][25] ;
+void dfs(int from,int u,int dep)
+{
+    T[u] = from ;
+    L[u] = dep ;
+    for(int i=0;i<graph[u].size();i++)
+    {
+        int v = graph[u][i];
+        dfs(u,v,dep+1);
+    }
+}
+void lca_init(int N)
+{
+    memo(P,-1);
+    for(int i=0;i<N;i++)
+    {
+        P[i][0]=T[i];
+    }
+
+    for(int j=1;(1<<j)<N;j++)
+    {
+        for(int i=0;i<N;i++)
+        {
+            if(P[i][j-1]!=-1)
+            {
+                P[i][j] = P[P[i][j-1]][j-1];
+            }
+        }
+    }
+}
+int lca_query(int p,int q ,int N)
+{
+    int i , tmp , log ;
+    if(L[p]<L[q]) tmp = p , p = q , q = tmp ;
+
+    log = 1 ;
+    while( 1 )
+    {
+        int next = log + 1 ;
+        if((1<<next)>L[p]) break;
+        log++;
+    }
+
+    for(i=log;i>=0;i--)
+    {
+        if(L[p]-(1<<i)>=L[q]) p=P[p][i];
+    }
+
+    if(p==q) return q ;
+
+    for(i=log;i>=0;i--)
+    {
+        if(P[p][i]!=-1 && P[p][i]!=P[q][i])
+        {
+            p = P[p][i] ;
+            q = P[q][i] ;
+        }
+    }
+    return T[p];
+}
+int main()
+{
+    int N , Q ; // N is the number of nodes and Q is the number of queries .
+    scanf("%d%d",&N,&Q);
+    for(int i=0;i<N;i++)
+    {
+        int k ; // k is the number of children of i node .
+        scanf("%d",&k);
+        while(k--)
+        {
+            int child ;
+            scanf("%d",&child);
+            graph[i].pb(child);
+        }
+    }
+    dfs(0,0,0);
+    lca_init(N);
+    while(Q--)
+    {
+        int p , q ; // Find the lowest common parent node of p and q .
+        scanf("%d%d",&p,&q);
+        printf("%d\n",lca_query(p,q,N));
+    }
+    return 0;
+}

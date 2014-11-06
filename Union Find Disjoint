@@ -1,3 +1,5 @@
+// Union Find Disjoint
+// Also called Disjoint Set Union (DSU) .
 #include <stdio.h>
 using namespace std;
 int parent[1000];

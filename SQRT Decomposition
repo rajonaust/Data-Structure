@@ -1,0 +1,70 @@
+// SQRT Decomposition (MO's Algorithm)
+// Given N numbers element ( 1-10^6 ) and Q numbers query and each query give two integer Left and Right .
+// Find the distinct element for each query from Left to Right .
+// Time Complexity O(N*sqrt(N))
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+const int block = 555 ;
+int arr[30000+10] , cnt[1000000+10] , res[200000+10],ans=0;
+struct Node
+{
+    int l , r , id ;
+}V[200000+10];
+bool cmp(Node A,Node B)
+{
+    if(A.l/block == B.l/block) return A.r < B.r ;
+    return A.l/block < B.l/block ;
+}
+void add(int position)
+{
+    cnt[arr[position]]++;
+    if(cnt[arr[position]]==1) ans++;
+}
+void remove(int position)
+{
+    cnt[arr[position]]--;
+    if(cnt[arr[position]]==0) ans--;
+}
+int main()
+{
+    int N , Q ; // N is the number of elements and Q is the number queries .
+    scanf("%d",&N);
+    for(int i=1;i<=N;i++) scanf("%d",&arr[i]);
+    scanf("%d",&Q);
+    for(int i=1;i<=Q;i++)
+    {
+        scanf("%d%d",&V[i].l,&V[i].r);
+        V[i].id = i ;
+    }
+    sort(&V[1],&V[Q+1],cmp);
+
+    int currentL = 0 , currentR = 0 ;
+    for(int i=1;i<=Q;i++)
+    {
+        int L = V[i].l , R = V[i].r ;
+        while(currentL<L)
+        {
+            remove(currentL);
+            currentL++;
+        }
+        while(currentL>L)
+        {
+            currentL--;
+            add(currentL);
+        }
+        while(currentR<R)
+        {
+            currentR++;
+            add(currentR);
+        }
+        while(currentR>R)
+        {
+            remove(currentR);
+            currentR--;
+        }
+        res[V[i].id]=ans;
+    }
+    for(int i=1;i<=Q;i++) printf("%d\n",res[i]);
+    return 0;
+}

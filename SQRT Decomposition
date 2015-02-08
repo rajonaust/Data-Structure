@@ -1,6 +1,6 @@
 // SQRT Decomposition (MO's Algorithm)
 // Given N numbers element ( 1-10^6 ) and Q numbers query and each query give two integer Left and Right .
-// Find the distinct element for each query from Left to Right .
+// Find number of distinct elements for each query from Left to Right .
 // Time Complexity O(N*sqrt(N))
 #include <stdio.h>
 #include <algorithm>

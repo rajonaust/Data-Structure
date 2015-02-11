@@ -1,0 +1,61 @@
+// 2-D Binary Indexed Tree
+// Given Q queries . Each query contains 0 if add a co-ordinate (x,y) .
+// And contains 1 to find how many points in rectangle with lower left co-ordinates (x1,y1) and upper right co-ordinates (x2,y2) .
+// Time complexity O(Q*log(x)*log(y))
+#include <stdio.h>
+const int range = 1001 ;
+int bit[1000+10][1000+10] ;
+void update(int x,int y,int val)
+{
+    while(x<=range)
+    {
+        int y1 = y ;
+        while(y1<=range)
+        {
+            bit[x][y1]+=val;
+            y1+=(y1 & -y1);
+        }
+        x+=(x & -x);
+    }
+}
+int query(int x,int y)
+{
+    int sum = 0 ;
+    while(x>0)
+    {
+        int y1 = y ;
+        while(y1>0)
+        {
+            sum+=bit[x][y1];
+            y1-=(y1 & -y1);
+        }
+        x-=(x & -x);
+    }
+    return sum ;
+}
+int queryFull(int x1,int y1,int x2,int y2)
+{
+    return query(x2,y2) - query(x2,y1-1) - query(x1-1,y2) + query(x1-1,y1-1) ;
+}
+int main()
+{
+    int Q ; // Number of queries .
+    scanf("%d",&Q);
+    while( Q-- )
+    {
+        int q , x1 , x2 , y1 , y2 ;
+        scanf("%d",&q);
+        switch(q)
+        {
+            case 0 :
+                scanf("%d%d",&x1,&y1);
+                update(x1+1,y1+1,1);
+                break ;
+            case 1 :
+                scanf("%d%d%d%d",&x1,&y1,&x2,&y2);
+                printf("%d\n",queryFull(x1+1,y1+1,x2+1,y2+1));
+                break ;
+        }
+    }
+    return 0;
+}

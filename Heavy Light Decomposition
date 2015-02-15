@@ -1,0 +1,248 @@
+// Heavy Light Decomposition
+// Given T test cases . Each test case contains N number of nodes . Next N-1 lines describe the edge .
+// Each edge contains two nodes u , v and cost between them w .
+// Given Q queries . Each query ask QUERY , CHANGE or DONE .
+// QUERY u v means maximum cost between path u to v . CHANGE i w means change the i'th edge cost to w . DONE means end of test case .
+// Time Complexity (N*logN)
+#include <cstdio>
+#include <vector>
+using namespace std;
+
+int N , dep[10000+10] , subTree[10000+10] , P[10000+10][25] , tree[3*10000+10] ;
+int chainNo , ptr , chainHead[10000+10] , chainNumber[10000+10] , chainPos[10000+10] , chainRev[10000+10] , chainCost[10000+10] , chainEdge[10000+10] ;
+char arr[8] ;
+vector <int> graph[10000+10] , cost[10000+10] , post[10000+10] ;
+// Segment Tree part
+int build_tree(int node,int lo,int hi)
+{
+    if(lo==hi) return tree[node] = chainCost[lo] ;
+    int mid = (lo+hi)/2;
+    int x = build_tree(2*node,lo,mid);
+    int y = build_tree(2*node+1,mid+1,hi);
+    return tree[node] = max(x,y);
+}
+
+int update_tree(int node,int lo,int hi,int X,int val)
+{
+    if(lo>X||hi<X) return tree[node];
+    if(lo==X&&hi==X) return tree[node] = val ;
+    int mid = (lo+hi)/2;
+    int x = update_tree(2*node,lo,mid,X,val);
+    int y = update_tree(2*node+1,mid+1,hi,X,val);
+    return tree[node] = max(x,y);
+}
+
+int query_tree(int node,int lo,int hi,int L,int R)
+{
+    if(L>hi||R<lo) return -1;
+    if(lo>=L&&hi<=R) return tree[node] ;
+    int mid = (lo+hi)/2;
+    int x = query_tree(2*node,lo,mid,L,R);
+    int y = query_tree(2*node+1,mid+1,hi,L,R);
+    return max(x,y);
+}
+// Finding chain and query for each chain
+int queryUp(int u,int v)
+{
+    int chainU , chainV = chainNumber[v] , ans = 0 ;
+    while(true)
+    {
+        chainU = chainNumber[u] ;
+        if(chainU==chainV)
+        {
+            if(u==v) break ;
+            ans=max(ans,query_tree(1,1,N,chainPos[v]+1,chainPos[u]));
+            break ;
+        }
+        else
+        {
+            int head = chainHead[chainU];
+            ans=max(ans,query_tree(1,1,N,chainPos[head],chainPos[u]));
+            u=P[head][0];
+        }
+    }
+    return ans ;
+}
+// Lowest Common Ancestor part .
+int query_lca(int p,int q)
+{
+    int t , log = 0 , next = 0 ;
+    if(dep[p]<dep[q]) t = p , p = q , q = t ;
+    while( true )
+    {
+        if((1<<next)>dep[p]) break ;
+        log = next ;
+        next++;
+    }
+
+    for(int i=log;i>=0;i--) if(dep[p]-(1<<i)>=dep[q]) p = P[p][i] ;
+
+    if(p==q) return p ;
+
+    for(int i=log;i>=0;i--)
+    {
+        if(P[p][i]!=-1&&P[p][i]!=P[q][i])
+        {
+            p = P[p][i] ;
+            q = P[q][i] ;
+        }
+    }
+
+    return P[p][0] ;
+}
+
+int query(int u , int v)
+{
+    int c = query_lca(u,v);
+    return max(queryUp(u,c),queryUp(v,c));
+}
+
+// Heavy Light Decomposition
+void HLD(int u,int prev,int tcost,int edge)
+{
+    if(chainHead[chainNo]==-1) chainHead[chainNo] = u ;
+    chainNumber[u] = chainNo ;
+    chainCost[ptr] = tcost ;
+    chainPos[u] = ptr ;
+    chainRev[ptr] = u ;
+    chainEdge[edge] = ptr ;
+    ptr++;
+
+    int sc =-1, ncost , nedge ;
+    for(int i=0;i<graph[u].size();i++)
+    {
+        int v = graph[u][i];
+        if(v==prev) continue ;
+        if(sc==-1||subTree[sc]<subTree[v]) sc = v , ncost = cost[u][i] , nedge = post[u][i] ;
+    }
+
+    if(sc!=-1) HLD(sc,u,ncost,nedge);
+
+    for(int i=0;i<graph[u].size();i++)
+    {
+        int v = graph[u][i];
+        if(v==prev||v==sc) continue ;
+        chainNo++;
+        HLD(v,u,cost[u][i],post[u][i]);
+    }
+}
+
+// dfs function to calculate every node's parent , depth , subtree size .
+void dfs(int u,int prev,int _dep)
+{
+    dep[u] = _dep ;
+    P[u][0] = prev ;
+    subTree[u]=1;
+    for(int i=0;i<graph[u].size();i++)
+    {
+        int v = graph[u][i] ;
+        if(v==prev) continue ;
+        dfs(v,u,_dep+1);
+        subTree[u]+=subTree[v];
+    }
+}
+// Reset all the containers .
+void Reset()
+{
+    chainNo = 1 ;
+    ptr = 1 ;
+    for(int i=0;i<=10000;i++)
+    {
+        graph[i].clear();
+        cost[i].clear();
+        post[i].clear();
+        subTree[i] = 0 ;
+        chainHead[i]=-1;
+        for(int j=0;j<=20;j++) P[i][j]=-1;
+    }
+}
+
+int main()
+{
+    int test ; // Number of test cases .
+    scanf("%d",&test);
+    while( test-- )
+    {
+        Reset();
+        scanf("%d",&N);
+
+        for(int i=1;i<N;i++)
+        {
+            int u , v , w ;
+            scanf("%d%d%d",&u,&v,&w);
+            graph[u].push_back(v);
+            graph[v].push_back(u);
+            cost[u].push_back(w);
+            cost[v].push_back(w);
+            post[u].push_back(i);
+            post[v].push_back(i);
+        }
+
+        dfs(1,-1,0);
+        HLD(1,-1,-1,0);
+
+        for(int i=1;i<=20;i++)
+        {
+            for(int j=1;j<=10000;j++)
+            {
+                if(P[j][i-1]!=-1) P[j][i] = P[P[j][i-1]][i-1];
+            }
+        }
+
+        build_tree(1,1,N);
+
+        while(scanf("%s",&arr)==1)
+        {
+            if(arr[0]=='Q')
+            {
+                int u ,v  ;
+                scanf("%d%d",&u,&v);
+                printf("%d\n",query(u,v));
+            }
+            else if(arr[0]=='C')
+            {
+                int u , val ;
+                scanf("%d%d",&u,&val);
+                update_tree(1,1,N,chainEdge[u],val);
+            }
+            else break ;
+        }
+    }
+    return 0;
+}
+/*
+2
+
+11
+1 6 19
+1 2 8
+2 3 3
+2 4 1
+4 5 5
+3 7 4
+3 10 6
+6 8 11
+6 11 20
+8 9 2
+QUERY 10 8
+Qury 8 11
+CHANGE 9 3
+QUERY 8 11
+DONE
+
+3
+1 2 1
+2 3 2
+QUERY 1 2
+CHANGE 1 3
+QUERY 1 2
+DONE
+*/
+
+/*
+19
+20
+11
+1
+3
+*/

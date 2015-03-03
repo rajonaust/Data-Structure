@@ -7,6 +7,8 @@ Time Complexity
 4. insert O(logN)
 5. remove O(log N)
 */
+#include <bits/stdc++.h>
+using namespace std ;
 struct heap
 {
     int cnt , arr[100000+10] ;
@@ -60,3 +62,33 @@ struct heap
         return arr[1] ;
     }
 };
+int main()
+{
+    heap obj ;
+
+    obj.insert(10); // Insert elements .
+    obj.insert(-100);
+    obj.insert(500);
+
+    cout << "Smallest Element : " << obj.front() << endl ;
+    obj.remove() ; // Remove smallest element .
+    cout << "Smallest Element : " << obj.front() << endl ;
+    obj.remove();
+
+    cout << "Heap Size : " << obj.size() << endl ; // Size of heap .
+
+    obj.clear() ; // Clear heap .
+    cout << "Heap Size : " << obj.size() << endl ;
+
+    obj.insert(10000);
+    cout << "Smallest Element : " << obj.front() << endl ;
+
+    return 0;
+}
+/*
+Smallest Element : -100
+Smallest Element : 10
+Heap Size : 1
+Heap Size : 0
+Smallest Element : 10000
+*/

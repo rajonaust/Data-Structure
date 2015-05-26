@@ -1,0 +1,45 @@
+// Sliding Window
+// Give N elements and an interval K .
+// Find out minimum from every K intervals in the N elements .
+// Time Complexity O(N)
+#include <cstdio>
+#include <deque>
+using namespace std;
+#define ff first
+#define ss second
+typedef long long ll ;
+int arr[100+10] , dp[100+10] , N , K ;
+int main()
+{
+    scanf("%d%d",&N,&K); // N is the number of elements and K is the interval
+    for(int i=1;i<=N;i++) scanf("%d",&arr[i]);
+
+    deque < pair<int,int> > deq ;
+
+    for(int i=1;i<=N;i++)
+    {
+        if(!deq.empty()&&deq.front().ss<=i-K)
+            deq.pop_front();
+        while(!deq.empty()&&deq.back().ff>=arr[i]) // Change '>=' to '<=' for maximum value .
+            deq.pop_back();
+        deq.push_back(make_pair(arr[i],i));
+        if(i-K>=0)
+            dp[i-K] = deq.front().ff ;
+    }
+
+    for(int i=0;i<=N-K;i++)
+    {
+        if(i!=0) printf(" ");
+        printf("%d",dp[i]);
+        if(i==N-K) printf("\n");
+    }
+
+    return 0;
+}
+/*
+8 3
+1 3 -1 -3 5 3 6 7
+*/
+/*
+-1 -3 -3 -3 3 3
+*/

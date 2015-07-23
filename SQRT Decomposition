@@ -45,7 +45,7 @@ int main()
         int L = V[i].l , R = V[i].r ;
         while(currentL<L)
         {
-            remove(currentL);
+            if(currentL!=0)remove(currentL);
             currentL++;
         }
         while(currentL>L)

@@ -14,7 +14,7 @@ int main()
     scanf("%d%d",&N,&K); // N is the number of elements and K is the interval
     for(int i=1;i<=N;i++) scanf("%d",&arr[i]);
 
-    deque < pair<int,int> > deq ;
+    deque < pair<int,int> > deq ; // Monotonic Queue .
 
     for(int i=1;i<=N;i++)
     {

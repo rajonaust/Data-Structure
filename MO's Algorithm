@@ -1,4 +1,4 @@
-// SQRT Decomposition (MO's Algorithm)
+// MO's Algorithm ( Query square root decomposition )
 // Given N numbers element ( 1-10^6 ) and Q numbers query and each query give two integer Left and Right .
 // Find number of distinct elements for each query from Left to Right .
 // Time Complexity O(N*sqrt(N))

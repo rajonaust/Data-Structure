@@ -1,0 +1,77 @@
+// Square Root Decomposition
+// Given value of array . Change any index value . Find lowest value from any index to another index in array .
+// Time complexity for update and query operation O ( sqrt( N ) ) and total complexity O( N*sqrt( N ) ) .
+
+#include <bits/stdc++.h>
+using namespace std;
+
+const int blockSZ = 600 , INF = 2147483647 ;
+int arr[100000+10] , BLOCK[600] ;
+
+int getID(int index)
+{
+    return index / blockSZ ;
+}
+
+void update(int index,int value)
+{
+    arr[index] = value ;
+    int blockID = getID(index) , start = blockID*blockSZ , end = (blockID+1)*blockSZ-1 ;
+
+    for(int i=start ; i<=end ;i++)
+    {
+        if(i==start) BLOCK[blockID] = arr[i] ;
+        else BLOCK[blockID] = min(BLOCK[blockID],arr[i]);
+    }
+}
+
+int query(int L,int R)
+{
+    int lid = getID(L) , rid = getID(R) ;
+
+    if(lid==rid)
+    {
+        int mn =  INF ;
+        for(int i=L;i<=R;i++) mn = min(mn,arr[i]);
+        return mn ;
+    }
+
+    int mn1 = INF , mn2 = INF , mn3 = INF ;
+
+    for(int i=L;i<=lid*blockSZ+blockSZ-1;i++) mn1 = min(mn1,arr[i]);
+    for(int i=lid+1;i<rid;i++) mn2 = min(mn2,BLOCK[i]);
+    for(int i=rid*blockSZ;i<=R;i++) mn3 = min(mn3,arr[i]);
+
+    return min(min(mn1,mn3),mn2);
+}
+
+int main()
+{
+    int N , Q ; // N is number of indexes and Q is the number o queries .
+    scanf("%d%d",&N,&Q);
+
+    for(int i=0;i<N;i++)
+    {
+        int a ;
+        scanf("%d",&a);
+        update(i,a);
+    }
+
+    while( Q-- )
+    {
+        int d , x , y ; // If d is 0 than update arr[x] = y . If direction is 1 than find the lowest value from x to y indexes . Here constraint is 1<=x<=y<=N .
+        scanf("%d%d%d",&d,&x,&y);
+
+        switch( d )
+        {
+            case 0 :
+                update(x-1,y);
+                break ;
+
+            case 1 :
+                printf("%d\n",query(x-1,y-1));
+                break ;
+        }
+    }
+    return 0;
+}
